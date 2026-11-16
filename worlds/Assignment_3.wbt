@@ -1,0 +1,105 @@
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/robots/gctronic/e-puck/protos/E-puck.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/animals/protos/Dog.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/animals/protos/Deer.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/animals/protos/Horse.proto"
+
+WorldInfo {
+  info [
+    "Assignment 3: one arena with red, green and blue blocks, a dog, a deer and a horse."
+    "The e-puck reports colour blocks, classifies the animals with the CIFAR-10 CNN"
+    "and saves a camera image of every detection in controllers/Assignment_3/captures."
+  ]
+}
+Viewpoint {
+  orientation -0.5774 0.5774 0.5774 2.0944
+  position 0 0 5.2
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  floorSize 3 3
+}
+E-puck {
+  translation 0 0 0
+  controller "Assignment_3"
+  supervisor TRUE
+}
+DEF RED_BLOCK Solid {
+  translation 0.6 0 0.05
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 0.3 0.3 0.1
+      }
+    }
+  ]
+  name "RED_BLOCK"
+  boundingObject Box {
+    size 0.3 0.3 0.1
+  }
+}
+DEF BLUE_BLOCK Solid {
+  translation -0.6 0 0.05
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 0 1
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 0.3 0.3 0.1
+      }
+    }
+  ]
+  name "BLUE_BLOCK"
+  boundingObject Box {
+    size 0.3 0.3 0.1
+  }
+}
+DEF GREEN_BLOCK Solid {
+  translation 0 0.6 0.05
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 1 0
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 0.3 0.3 0.1
+      }
+    }
+  ]
+  name "GREEN_BLOCK"
+  boundingObject Box {
+    size 0.3 0.3 0.1
+  }
+}
+Dog {
+  translation 0.95 0.95 0
+  rotation 0 0 1 2.356
+  scale 0.28
+}
+Deer {
+  translation 0.95 -0.95 0
+  rotation 0 0 1 -2.356
+  scale 0.22
+}
+Horse {
+  translation -0.95 -0.95 0
+  rotation 0 0 1 -0.785
+  scale 0.1
+}
