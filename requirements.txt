@@ -1,0 +1,11 @@
+# Notebook (training and evaluation)
+torch>=2.0
+torchvision>=0.15
+torchinfo
+datasets
+scikit-learn
+pandas
+matplotlib
+numpy
+Pillow
+tqdm

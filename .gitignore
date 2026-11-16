@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Model weights, datasets and generated outputs
+data/
+outputs/
+*.pth
+*.pt
+*.onnx
+cnn_outputs.zip
+
+# Webots
+.*.wbproj
+controllers/**/captures/
+controllers/**/frames/
+
+# OS and editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
