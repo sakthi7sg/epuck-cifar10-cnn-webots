@@ -10,7 +10,7 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/project
 
 WorldInfo {
   info [
-    "Assignment 3: one arena with red, green and blue blocks, a dog, a deer and a horse."
+    "Assignment 3: one arena with red, green and blue blocks, a dog, a deer, a horse and a truck."
     "The e-puck reports colour blocks, classifies the animals with the CIFAR-10 CNN"
     "and saves a camera image of every detection in controllers/Assignment_3/captures."
   ]
@@ -102,4 +102,211 @@ Horse {
   translation -0.95 -0.95 0
   rotation 0 0 1 -0.785
   scale 0.1
+}
+DEF TRUCK Solid {
+  translation -0.95 0.95 0
+  rotation 0 0 1 0.785
+  children [
+    Pose {
+      translation -0.06 0 0.16
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.92 0.92 0.92
+            roughness 0.6
+            metalness 0
+          }
+          geometry Box {
+            size 0.30 0.20 0.20
+          }
+        }
+      ]
+    }
+    Pose {
+      translation 0.16 0 0.125
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.80 0.10 0.10
+            roughness 0.5
+            metalness 0
+          }
+          geometry Box {
+            size 0.13 0.19 0.15
+          }
+        }
+      ]
+    }
+    Pose {
+      translation 0.2275 0 0.15
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.12 0.16 0.24
+            roughness 0.2
+            metalness 0
+          }
+          geometry Box {
+            size 0.005 0.16 0.07
+          }
+        }
+      ]
+    }
+    Pose {
+      translation 0.165 0 0.155
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.12 0.16 0.24
+            roughness 0.2
+            metalness 0
+          }
+          geometry Box {
+            size 0.07 0.192 0.06
+          }
+        }
+      ]
+    }
+    Pose {
+      translation 0.01 0 0.055
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.25 0.25 0.25
+            roughness 0.8
+            metalness 0
+          }
+          geometry Box {
+            size 0.44 0.17 0.03
+          }
+        }
+      ]
+    }
+    Pose {
+      translation 0.23 0 0.07
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.20 0.20 0.20
+            roughness 0.6
+            metalness 0
+          }
+          geometry Box {
+            size 0.01 0.17 0.04
+          }
+        }
+      ]
+    }
+    Pose {
+      translation 0.15 0.095 0.04
+      rotation 1 0 0 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.08 0.08 0.08
+            roughness 0.9
+            metalness 0
+          }
+          geometry Cylinder {
+            height 0.03
+            radius 0.04
+          }
+        }
+      ]
+    }
+    Pose {
+      translation 0.15 -0.095 0.04
+      rotation 1 0 0 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.08 0.08 0.08
+            roughness 0.9
+            metalness 0
+          }
+          geometry Cylinder {
+            height 0.03
+            radius 0.04
+          }
+        }
+      ]
+    }
+    Pose {
+      translation -0.05 0.095 0.04
+      rotation 1 0 0 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.08 0.08 0.08
+            roughness 0.9
+            metalness 0
+          }
+          geometry Cylinder {
+            height 0.03
+            radius 0.04
+          }
+        }
+      ]
+    }
+    Pose {
+      translation -0.05 -0.095 0.04
+      rotation 1 0 0 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.08 0.08 0.08
+            roughness 0.9
+            metalness 0
+          }
+          geometry Cylinder {
+            height 0.03
+            radius 0.04
+          }
+        }
+      ]
+    }
+    Pose {
+      translation -0.15 0.095 0.04
+      rotation 1 0 0 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.08 0.08 0.08
+            roughness 0.9
+            metalness 0
+          }
+          geometry Cylinder {
+            height 0.03
+            radius 0.04
+          }
+        }
+      ]
+    }
+    Pose {
+      translation -0.15 -0.095 0.04
+      rotation 1 0 0 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.08 0.08 0.08
+            roughness 0.9
+            metalness 0
+          }
+          geometry Cylinder {
+            height 0.03
+            radius 0.04
+          }
+        }
+      ]
+    }
+  ]
+  name "truck"
+  boundingObject Pose {
+    translation 0.01 0 0.13
+    children [
+      Box {
+        size 0.45 0.2 0.26
+      }
+    ]
+  }
 }

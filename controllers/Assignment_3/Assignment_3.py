@@ -1,11 +1,11 @@
 """E-puck search with colour-block detection and CNN object classification (Webots, Python).
 
 One arena holds a red, a blue and a green block (0.3 x 0.3 x 0.1 m, placed at random)
-and animals (a dog, a deer and a horse). The e-puck searches the arena and:
+and four CIFAR-10 objects (a dog, a deer, a horse and a truck). The e-puck searches the arena and:
 
   * colour blocks: prints "I see <colour>" on the FIRST encounter of each colour,
     then a summary of the colours found so far (as in Part 1);
-  * animals: when it faces an animal, it classifies the camera image with the
+  * objects: when it faces an animal or the truck, it classifies the camera image with the
     CIFAR-10 CNN trained in notebooks/Assignment_3_CNN.ipynb and prints the prediction;
   * every detection is saved as a camera image in the captures folder.
 
@@ -39,7 +39,9 @@ TIME_LIMIT = 480.0              # stop after this many simulated seconds (s)
 
 COLOURS = {"red": (1, 0, 0), "blue": (0, 0, 1), "green": (0, 1, 0)}
 ANIMALS = ("Dog", "Cat", "Horse", "Deer")       # Webots PROTO names (also CIFAR-10 classes)
+OBJECTS_BY_DEF = {"TRUCK": "truck"}              # other CIFAR-10 objects, found by their DEF name
 PHOTO_RANGE = (0.35, 0.7)       # take an animal photo between these distances (m)
+PHOTO_RANGE_FOR = {"truck": (0.75, 1.1), "deer": (0.6, 0.95)}   # taller objects: photo from further away
 PHOTO_BEARING = 0.12            # ... when the animal is this close to straight ahead (rad)
 MIN_CONFIDENCE = 0.40           # below this the CNN result is reported as "not sure"
 USE_INT8 = False                # True: static int8 quantisation (faster, about 4x smaller)
@@ -51,14 +53,19 @@ CAPTURE_DIR = os.path.join(HERE, "captures")
 
 # ---------------------------------------------------------------- 1. arena set-up
 def find_animals(robot):
-    """Return {name: (x, y)} of the animal models in the world."""
+    """Return {name: (x, y)} of the animals (and other CIFAR-10 objects such as the truck) in the world."""
     animals = {}
     children = robot.getRoot().getField("children")
     for i in range(children.getCount()):
         node = children.getMFNode(i)
         if node.getTypeName() in ANIMALS:
-            x, y = node.getField("translation").getSFVec3f()[:2]
-            animals[node.getTypeName().lower()] = (x, y)
+            label = node.getTypeName().lower()
+        elif node.getDef() in OBJECTS_BY_DEF:
+            label = OBJECTS_BY_DEF[node.getDef()]
+        else:
+            continue
+        x, y = node.getField("translation").getSFVec3f()[:2]
+        animals[label] = (x, y)
     return animals
 
 
@@ -320,8 +327,9 @@ def main():
             dist = math.hypot(ax - x, ay - y)
             bearing = math.atan2(math.sin(math.atan2(ay - y, ax - x) - heading),
                                  math.cos(math.atan2(ay - y, ax - x) - heading))
+            near_lim, far_lim = PHOTO_RANGE_FOR.get(animal, PHOTO_RANGE)
             targets.append((dist, bearing, animal))
-            if PHOTO_RANGE[0] <= dist <= PHOTO_RANGE[1] and abs(bearing) <= PHOTO_BEARING:
+            if near_lim <= dist <= far_lim and abs(bearing) <= PHOTO_BEARING:
                 if model is None:
                     log.report_animal(animal, t)
                 elif pending is None:
@@ -370,7 +378,7 @@ def main():
             l = r = SPEED
             detour -= 1
         else:
-            near = [tg for tg in targets if tg[0] > PHOTO_RANGE[0]]
+            near = [tg for tg in targets if tg[0] > PHOTO_RANGE_FOR.get(tg[2], PHOTO_RANGE)[0]]
             if near:                                            # steer to the nearest animal without a photo
                 dist, bearing, _ = min(near)
                 turn = max(-1.0, min(1.0, 2.0 * bearing))
