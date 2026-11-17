@@ -56,7 +56,8 @@ epuck-cifar10-cnn-webots/
 │   └── Assignment_3.wbt            # 3 x 3 m arena: red, green, blue blocks + dog, deer, horse, truck
 ├── images/
 │   ├── test_images/                # my photos (car, cat, bird) and e-puck camera images
-│   └── webots_captures/            # images saved by the robot during a run
+│   ├── webots_captures/            # images saved by the robot during a run
+│   └── results/                    # prediction figure and Colab screenshots
 ├── requirements.txt                # Python packages for the notebook
 └── README.md
 ```
@@ -130,7 +131,23 @@ To reduce this gap without retraining, the notebook (step 6, `SMART_CROP`) adds 
 | Object crop | Finds the object above the pink arena floor, ignoring the sky and the hills, and crops a square around it | CIFAR-10 objects fill the frame; a blue-sky background pushes the CNN towards *airplane* |
 | Test-time augmentation | Averages the predictions of two zoom levels and their mirror images | More stable predictions on small, low-resolution images |
 
-The result table shows the plain centre-crop prediction next to the improved one. Fine-tuning on labelled Webots images (see future work) is the full fix.
+Results with my trained model (Colab, T4 GPU):
+
+| Image | Centre crop only | Object crop + TTA | Correct? |
+|---|---|---|:-:|
+| My photo: car | automobile (91.8 %) | automobile (86.9 %) | ✔ |
+| My photo: cat | cat (69.2 %) | cat (78.5 %) | ✔ |
+| My photo: bird | bird (70.2 %) | bird (62.3 %) | ✔ |
+| Webots: dog | deer (41.9 %) | horse (52.6 %) | ✘ |
+| Webots: deer | airplane (27.8 %) | airplane (32.8 %), deer second (≈ 30 %) | ✘ |
+| Webots: horse | airplane (36.4 %) | **horse (54.7 %)** | ✔ |
+| Webots: truck | truck (88.4 %) | truck (90.3 %) | ✔ |
+
+The object crop fixes the horse (airplane → horse) and keeps the truck and the three photos correct. The dog and the deer are still wrong: the 52 × 39 deer image is wider than it is tall, so the square crop cannot remove the sky, and the smooth 3D dog model looks more like a horse than like the dog photos in CIFAR-10. Fine-tuning on labelled Webots images (see future work) is the full fix.
+
+![Predictions on the Webots images](images/results/image_predictions.png)
+
+Screenshots of the first Colab run, before the object crop, are in [`images/results`](images/results).
 
 ---
 
