@@ -5,12 +5,12 @@
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C?logo=pytorch&logoColor=white)
 ![Dataset](https://img.shields.io/badge/Dataset-CIFAR--10-5FA857)
 
-A simulated **e-puck** robot in Webots searches an arena with **three coloured blocks** and **three animals**. It detects the blocks by colour and takes a camera image of every block and animal it finds. A **convolutional neural network (CNN)** trained on CIFAR-10 classifies the animal images. The CNN is also made smaller and faster so that it can run on the robot without slowing down its control loop.
+A simulated **e-puck** robot in Webots searches an arena with **three coloured blocks**, **three animals** and a **truck**. It detects the blocks by colour and takes a camera image of every block and object it finds. A **convolutional neural network (CNN)** trained on CIFAR-10 classifies the animal and truck images. The CNN is also made smaller and faster so that it can run on the robot without slowing down its control loop.
 
 > Applied Robotics and AI Project, Part 2 (Assignment 3) · BEng (Hons) Robotics and Artificial Intelligence · University of Hertfordshire
 
 ![E-puck camera captures](images/webots_captures/all_captures.png)
-<p align="center"><em>Images saved by the e-puck camera during one run: dog, deer, horse, red, green and blue block.</em></p>
+<p align="center"><em>Images saved by the e-puck camera during one run: dog, deer, horse, truck, red, green and blue block.</em></p>
 
 ---
 
@@ -44,16 +44,16 @@ A simulated **e-puck** robot in Webots searches an arena with **three coloured b
 ## Repository structure
 
 ```text
-epuck-webots-cnn-object-detection/
+epuck-cifar10-cnn-webots/
 ├── notebooks/
 │   └── Assignment_3_CNN.ipynb      # training, evaluation, image predictions, optimisation
 ├── controllers/
 │   └── Assignment_3/
-│       ├── Assignment_3.py         # e-puck: colour-block search, animal photos, CNN predictions
+│       ├── Assignment_3.py         # e-puck: colour-block search, object photos, CNN predictions
 │       ├── cnn_model.py            # CNN definition (same network as in the notebook)
 │       └── requirements.txt
 ├── worlds/
-│   └── Assignment_3.wbt            # 3 x 3 m arena: red, green, blue blocks + dog, deer, horse
+│   └── Assignment_3.wbt            # 3 x 3 m arena: red, green, blue blocks + dog, deer, horse, truck
 ├── images/
 │   ├── test_images/                # my photos (car, cat, bird) and e-puck camera images
 │   └── webots_captures/            # images saved by the robot during a run
@@ -82,7 +82,7 @@ flowchart LR
 1. places the red, green and blue blocks at random positions, away from the robot and the animals;
 2. drives around the arena, avoids obstacles and turns on the spot every few seconds to look for colours;
 3. prints `I see red`, `I see green` or `I see blue` the first time it reaches each block, followed by a summary of the colours found so far;
-4. takes a photo when it faces an animal and, if the model is available, classifies it with the CNN;
+4. takes a photo when it faces an animal or the truck and, if the model is available, classifies it with the CNN;
 5. saves every detection as an image in `controllers/Assignment_3/captures/` and stops when everything has been found.
 
 A watchdog makes the robot back off and turn if it has not moved for a few seconds, so it cannot get stuck next to a block.
@@ -123,6 +123,15 @@ A VGG-style network with three convolution blocks and about **0.81 M parameters*
 
 **Webots camera images.** The e-puck camera gives only 52 × 39 pixels, the animals are rendered 3D models rather than photos, and the camera is close to the floor. The CNN is therefore less confident on the Webots images than on real photos and can confuse similar four-legged animals. The coloured blocks are not CIFAR-10 classes, so they are detected by colour instead of by the CNN.
 
+To reduce this gap without retraining, the notebook (step 6, `SMART_CROP`) adds two steps for Webots images:
+
+| Step | What it does | Why |
+|---|---|---|
+| Object crop | Finds the object above the pink arena floor, ignoring the sky and the hills, and crops a square around it | CIFAR-10 objects fill the frame; a blue-sky background pushes the CNN towards *airplane* |
+| Test-time augmentation | Averages the predictions of two zoom levels and their mirror images | More stable predictions on small, low-resolution images |
+
+The result table shows the plain centre-crop prediction next to the improved one. Fine-tuning on labelled Webots images (see future work) is the full fix.
+
 ---
 
 ## Optimisation for the robot
@@ -132,7 +141,7 @@ The e-puck updates its motors every **64 ms**. A classification that blocks the 
 | Measure | How | Effect |
 |---|---|---|
 | Background thread | The CNN runs in a `ThreadPoolExecutor`; the control loop only collects finished results | Motor commands are never delayed |
-| Event-triggered inference | The CNN runs only when the robot faces an animal, not on every frame | Much lower CPU load |
+| Event-triggered inference | The CNN runs only when the robot faces an animal or the truck, not on every frame | Much lower CPU load |
 | Single CPU thread | `torch.set_num_threads(1)` | Matches a small robot computer |
 | Static int8 quantisation | `USE_INT8 = True` in the controller | About 4 × smaller and about 2 × faster on the CPU |
 
@@ -146,7 +155,7 @@ The notebook compares FP32, dynamic int8, static int8 and 50 % pruning on accura
 
 1. Open `notebooks/Assignment_3_CNN.ipynb` in Jupyter or any notebook service with a GPU.
 2. Run all cells. Each step prints its progress, and the tables and figures are saved in `outputs/`.
-3. At step 6, choose your own images, or cancel to use the saved images (car, cat, bird and the three e-puck camera images).
+3. At step 6, choose your own images, or cancel to use the saved images (car, cat, bird and four e-puck camera images: dog, deer, horse, truck).
 4. At the end, `cifar10_cnn.pth` and `cnn_outputs.zip` are downloaded.
 
 ### 2. Run the Webots arena
@@ -166,7 +175,7 @@ The notebook compares FP32, dynamic int8, static int8 and 50 % pruning on accura
 
 1. Install PyTorch in the Python that Webots uses (**Tools → Preferences → Python command**): `pip install torch`
 2. Copy `cifar10_cnn.pth` into `controllers/Assignment_3/`.
-3. Run the world again. Each animal photo is now followed by the CNN prediction and its confidence.
+3. Run the world again. Each animal or truck photo is now followed by the CNN prediction and its confidence.
 
 Without PyTorch or the model file, the colour search and the camera images still work.
 
